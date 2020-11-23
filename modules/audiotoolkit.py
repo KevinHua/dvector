@@ -2,6 +2,10 @@
 # -*- coding: utf-8 -*-
 """Preprocess audio file and data."""
 
+import os
+import tempfile
+
+import pydub
 import librosa
 import yaml
 import torch
@@ -44,6 +48,13 @@ class AudioToolkit:
 
     def file_to_wav_ndarray(self, file_path):
         """Ndarray from the path to audio file."""
+
+        # convert mp3 to wav for mp3 file
+        if file_path.lower().endswith('.mp3'):
+            wav_fn = os.path.join(tempfile.gettempdir(), 'dvector.mp3.wav')
+            au = pydub.AudioSegment.from_mp3(file_path)
+            au.export(wav_fn, format="wav")
+            file_path = wav_fn
 
         y, _ = librosa.load(file_path, sr=self.sample_rate)
         y, _ = librosa.effects.trim(y, top_db=self.min_db_to_trim)

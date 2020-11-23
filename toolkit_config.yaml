@@ -1,7 +1,7 @@
 sample_rate: 16000
-min_db_to_trim: 10
-negative_cutoff_db: 80
-n_fft: 512
-n_mels: 40
+min_db_to_trim: 16
+negative_cutoff_db: 100
+n_fft: 1024
+n_mels: 80
 f_min: 80
 f_max: 8000

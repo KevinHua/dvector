@@ -5,3 +5,5 @@
 *.npz
 runs
 model-*
+
+__pycache__

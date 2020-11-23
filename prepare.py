@@ -42,9 +42,9 @@ def prepare(root_paths, save_dir, config_path, max_amount):
 
             n_speakers += 1
 
-            specs_path = join_path(save_dir, f"s{n_speakers:04d}({spkr_id})")
+            specs_path = join_path(save_dir, f"s{n_speakers:04d}_{spkr_id}")
 
-            makedirs(specs_path)
+            makedirs(specs_path, exist_ok=True)
 
             with torch.no_grad():
                 specs = [audiotk.file_to_mel_tensor(u) for u in uttr_paths]

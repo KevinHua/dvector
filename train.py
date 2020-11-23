@@ -68,10 +68,10 @@ def train(train_dir, model_dir, config_path, checkpoint_path,
                               collate_fn=pad_batch, drop_last=True)
     train_iter = iter(train_loader)
 
-    assert len(train_set) >= n_speakers
-    assert len(valid_set) >= n_speakers
     print(f"Training starts with {len(train_set)} speakers. "
           f"(and {len(valid_set)} speakers for validation)")
+    assert len(train_set) >= n_speakers
+    assert len(valid_set) >= n_speakers
 
     # build network and training tools
     dvector = DVector().load_config_file(config_path)
