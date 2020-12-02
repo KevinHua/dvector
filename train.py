@@ -38,8 +38,10 @@ def parse_args():
                         help="test on validation set every [test_every] steps")
     parser.add_argument("-d", "--decay_every", type=int, default=100000,
                         help="decay learning rate every [decay_every] steps")
-    parser.add_argument("-n", "--n_speakers", type=int, default=32,
+    parser.add_argument("-n", "--n_speakers", type=int, default=8,
                         help="# of speakers per batch")
+    parser.add_argument("-v", "--n_valids", type=int, default=32,
+                        help="# of speakers for validation")
     parser.add_argument("-m", "--n_utterances", type=int, default=5,
                         help="# of utterances per speaker")
     parser.add_argument("-l", "--seg_len", type=int, default=128,
@@ -50,7 +52,7 @@ def parse_args():
 
 def train(train_dir, model_dir, config_path, checkpoint_path,
           n_steps, save_every, test_every, decay_every,
-          n_speakers, n_utterances, seg_len):
+          n_speakers, n_valids, n_utterances, seg_len):
     """Train a d-vector network."""
 
     # setup
@@ -58,8 +60,8 @@ def train(train_dir, model_dir, config_path, checkpoint_path,
 
     # load data
     dataset = SEDataset(train_dir, n_utterances, seg_len)
-    train_set, valid_set = random_split(dataset, [len(dataset)-2*n_speakers,
-                                                  2*n_speakers])
+    train_set, valid_set = random_split(dataset, [len(dataset)-n_valids,
+                                                  n_valids])
     train_loader = DataLoader(train_set, batch_size=n_speakers,
                               shuffle=True, num_workers=4,
                               collate_fn=pad_batch, drop_last=True)
