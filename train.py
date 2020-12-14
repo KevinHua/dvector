@@ -98,6 +98,8 @@ def train(train_dir, model_dir, config_path, checkpoint_path,
     writer = SummaryWriter(model_dir)
     pbar = tqdm.trange(n_steps)
 
+    min_loss = 1e308
+
     # start training
     for step in pbar:
 
@@ -127,13 +129,14 @@ def train(train_dir, model_dir, config_path, checkpoint_path,
 
         pbar.set_description(f"global = {total_steps}, loss = {loss:.4f}")
         writer.add_scalar("Training loss", loss, total_steps)
+        writer.add_scalar("Training min loss", min_loss, total_steps)
         writer.add_scalar("Gradient norm", grad_norm, total_steps)
 
         if (step + 1) % test_every == 0:
             batch = next(iter(valid_loader))
             embd = dvector(batch.to(device)).view(n_speakers, n_utterances, -1)
-            loss = criterion(embd)
-            writer.add_scalar("validation loss", loss, total_steps)
+            valid_loss = criterion(embd)
+            writer.add_scalar("validation loss", valid_loss, total_steps)
 
         if (step + 1) % save_every == 0:
             ckpt_path = os.path.join(model_dir, f"ckpt-{total_steps}.tar")
@@ -145,6 +148,22 @@ def train(train_dir, model_dir, config_path, checkpoint_path,
                 "scheduler": scheduler.state_dict(),
             }
             torch.save(ckpt_dict, ckpt_path)
+
+        if loss.item() < min_loss:
+            min_loss = loss.item()
+            ckpt_path = os.path.join(model_dir, f"dvector-ckpt-min-loss.tar")
+            ckpt_dict = {
+                "total_steps": total_steps,
+                "state_dict": dvector.state_dict(),
+                "criterion": criterion.state_dict(),
+                "optimizer": optimizer.state_dict(),
+                "scheduler": scheduler.state_dict(),
+            }
+            torch.save(ckpt_dict, ckpt_path)
+
+            with open(os.path.join(model_dir, "min_loss_step.txt"), "w", encoding="utf-8") as f:
+                import json
+                json.dump({'total_steps': total_steps, 'loss': min_loss}, f)
 
     print("Training completed.")
 
