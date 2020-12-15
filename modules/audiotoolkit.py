@@ -11,6 +11,9 @@ import yaml
 import torch
 from torchaudio.transforms import AmplitudeToDB, MelSpectrogram
 
+# adapted to autovc mel spectrogram
+import autovc_melsp
+
 
 class AudioToolkit:
     """Load and process audio data."""
@@ -97,17 +100,35 @@ class AudioToolkit:
 
         return mel_db.T
 
-    def file_to_mel_tensor(self, file_path, normalization=True, to_db=True):
+    def file_to_mel_tensor_(self, file_path, normalization=True, to_db=True):
         """Tensor of melspectrogram from the path to audio file."""
 
         tensor = self.file_to_wav_tensor(file_path)
 
         return self.wav_tensor_to_mel(tensor, normalization, to_db)
 
-    def file_to_mel_ndarray(self, file_path, normalization=True, to_db=True):
+    def file_to_mel_ndarray_(self, file_path, normalization=True, to_db=True):
         """Tensor of melspectrogram from the path to audio file."""
 
         tensor = self.file_to_wav_tensor(file_path)
         tensor = self.wav_tensor_to_mel(tensor, normalization, to_db)
 
         return tensor.numpy()
+    
+    ###########################################################################
+    ## adapted to autovc
+    def file_to_mel_tensor(self, file_path, normalization=True, to_db=True):
+        """Tensor of melspectrogram from the path to audio file."""
+
+        tensor = self.file_to_wav_tensor(file_path)
+
+        return autovc_melsp.log_melsp_01(tensor)
+
+    def file_to_mel_ndarray(self, file_path, normalization=True, to_db=True):
+        """Tensor of melspectrogram from the path to audio file."""
+
+        tensor = self.file_to_wav_tensor(file_path)
+        tensor = autovc_melsp.log_melsp_01(tensor)
+
+        return tensor.numpy()
+
