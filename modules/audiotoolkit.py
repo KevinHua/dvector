@@ -122,13 +122,14 @@ class AudioToolkit:
 
         tensor = self.file_to_wav_tensor(file_path)
 
-        return autovc_melsp.log_melsp_01(tensor)
+        return torch.from_numpy(autovc_melsp.log_melsp_01(tensor.numpy()))
 
-    def file_to_mel_ndarray(self, file_path, normalization=True, to_db=True):
+    def file_to_mel_ndarray_(self, file_path, normalization=True, to_db=True):
         """Tensor of melspectrogram from the path to audio file."""
 
         tensor = self.file_to_wav_tensor(file_path)
         tensor = autovc_melsp.log_melsp_01(tensor)
 
-        return tensor.numpy()
+        # is numpy
+        return tensor
 
